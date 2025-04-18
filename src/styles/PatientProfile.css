@@ -1,0 +1,547 @@
+.patient-profile {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.profile-header h2 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.edit-button {
+  padding: 0.7rem 1.4rem;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 5px rgba(52, 152, 219, 0.2);
+}
+
+.edit-button:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+.edit-button.active {
+  background-color: #e74c3c;
+  box-shadow: 0 2px 5px rgba(231, 76, 60, 0.2);
+}
+
+.edit-button.active:hover {
+  background-color: #c0392b;
+  box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+}
+
+.success-message, .error-message {
+  padding: 1rem 1.2rem;
+  margin-bottom: 1.8rem;
+  border-radius: 6px;
+  font-weight: 500;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.success-message {
+  background-color: #e8f5e9;
+  color: #388e3c;
+  border-left: 4px solid #388e3c;
+}
+
+.error-message {
+  background-color: #fbe9e7;
+  color: #d32f2f;
+  border-left: 4px solid #d32f2f;
+}
+
+.profile-section {
+  margin-bottom: 2.5rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.profile-section:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.profile-section h3 {
+  margin: 0;
+  padding: 1.2rem 1.5rem;
+  background-color: #f1f1f1;
+  color: #2c3e50;
+  font-size: 1.3rem;
+  font-weight: 600;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.section-content {
+  padding: 1.8rem;
+}
+
+/* Form Styles */
+.form-row {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.form-group {
+  flex: 1;
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.6rem;
+  font-weight: 500;
+  color: #2c3e50;
+  font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: #fff;
+}
+
+.form-group textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #3498db;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+}
+
+/* Profile Info Styles */
+.profile-info {
+  background-color: white;
+  border-radius: 6px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.info-row {
+  display: flex;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #f5f5f5;
+  padding-bottom: 0.8rem;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.info-row .label {
+  width: 180px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.info-row .value {
+  flex: 1;
+  color: #34495e;
+}
+
+/* Medical History Styles */
+.medical-history-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.2rem;
+}
+
+.medical-record-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border-left: 4px solid #3498db;
+}
+
+.medical-record-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+.medical-record-card h4 {
+  margin-top: 0;
+  margin-bottom: 0.8rem;
+  color: #3498db;
+  font-size: 1.2rem;
+}
+
+.medical-record-card p {
+  margin-bottom: 1.2rem;
+  color: #2c3e50;
+  line-height: 1.5;
+}
+
+.record-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  padding-top: 0.8rem;
+  border-top: 1px solid #f5f5f5;
+}
+
+/* Emergency Contacts Styles */
+.emergency-contacts-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.2rem;
+}
+
+.emergency-contact-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border-left: 4px solid #2ecc71;
+}
+
+.emergency-contact-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+.contact-name {
+  font-weight: 600;
+  font-size: 1.15rem;
+  margin-bottom: 0.8rem;
+  color: #2c3e50;
+}
+
+.contact-details {
+  color: #7f8c8d;
+  font-size: 0.95rem;
+}
+
+.contact-details div {
+  margin-bottom: 0.5rem;
+}
+
+.contact-relationship {
+  font-style: italic;
+}
+
+.contact-phone {
+  font-weight: 500;
+}
+
+.emergency-contact-form {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #2ecc71;
+}
+
+.contact-actions {
+  display: flex;
+  align-items: flex-end;
+}
+
+.remove-contact-button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(231, 76, 60, 0.2);
+}
+
+.remove-contact-button:hover {
+  background-color: #c0392b;
+  box-shadow: 0 3px 6px rgba(231, 76, 60, 0.3);
+}
+
+.add-contact-button {
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.8rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.5rem auto 0;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(46, 204, 113, 0.2);
+}
+
+.add-contact-button:hover {
+  background-color: #27ae60;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+}
+
+/* Document Upload Styles */
+.document-upload {
+  margin-bottom: 2.5rem;
+}
+
+.upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #bdc3c7;
+  border-radius: 8px;
+  padding: 2.5rem 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #f9f9f9;
+}
+
+.upload-label:hover {
+  border-color: #3498db;
+  background-color: rgba(52, 152, 219, 0.05);
+  transform: translateY(-2px);
+}
+
+.upload-icon {
+  font-size: 3rem;
+  color: #3498db;
+  margin-bottom: 1.2rem;
+}
+
+.upload-text {
+  color: #7f8c8d;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.file-input {
+  display: none;
+}
+
+.uploaded-files {
+  margin-top: 1.8rem;
+}
+
+.uploaded-files h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.files-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0 0;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border-radius: 6px;
+  padding: 0.9rem 1.2rem;
+  margin-bottom: 0.8rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.file-item:hover {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
+}
+
+.file-name {
+  flex: 1;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.file-size {
+  color: #7f8c8d;
+  margin: 0 1.2rem;
+  font-size: 0.9rem;
+}
+
+.remove-file {
+  background: none;
+  border: none;
+  color: #e74c3c;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+}
+
+.remove-file:hover {
+  color: #c0392b;
+  background-color: rgba(231, 76, 60, 0.1);
+}
+
+.file-item.document {
+  display: flex;
+  align-items: center;
+  border-left: 3px solid #3498db;
+}
+
+.document-icon {
+  font-size: 1.6rem;
+  margin-right: 1.2rem;
+  color: #3498db;
+  width: 24px;
+  text-align: center;
+}
+
+.document-info {
+  flex: 1;
+}
+
+.document-name {
+  display: block;
+  font-weight: 500;
+  color: #2c3e50;
+  margin-bottom: 0.3rem;
+}
+
+.document-date {
+  display: block;
+  font-size: 0.85rem;
+  color: #7f8c8d;
+}
+
+.document-download {
+  color: #3498db;
+  font-size: 1.3rem;
+  margin-left: 1.2rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.document-download:hover {
+  color: #2980b9;
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+.documents-list h4 {
+  margin-top: 0;
+  margin-bottom: 1.2rem;
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.no-data-message {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  color: #7f8c8d;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  font-size: 1.05rem;
+}
+
+.form-actions {
+  text-align: center;
+  margin-top: 2.5rem;
+}
+
+.save-button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.9rem 2.5rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(52, 152, 219, 0.2);
+}
+
+.save-button:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .patient-profile {
+    padding: 1.5rem;
+  }
+  
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .medical-history-list,
+  .emergency-contacts-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .info-row {
+    flex-direction: column;
+  }
+  
+  .info-row .label {
+    width: 100%;
+    margin-bottom: 0.3rem;
+  }
+} 
