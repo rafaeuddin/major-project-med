@@ -13,7 +13,7 @@ const PhoneLogin = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [countdown, setCountdown] = useState(0);
   
-  const { verifyEmailOTP, verifyPhoneOTP, currentUser } = useAuth();
+  const { verifyEmailOTP, verifyPhoneOTP, sendEmailOTP, sendPhoneOTP, currentUser, error: authError } = useAuth();
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -73,24 +73,19 @@ const PhoneLogin = () => {
     try {
       setLoading(true);
       
-      const endpoint = verificationType === 'email' 
-        ? '/api/auth/send-email-otp' 
-        : '/api/auth/send-phone-otp';
+      let success;
+      if (verificationType === 'email') {
+        success = await sendEmailOTP(contact);
+      } else {
+        success = await sendPhoneOTP(contact);
+      }
       
-      const contactField = verificationType === 'email' 
-        ? { email: contact } 
-        : { phone: contact };
-      
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(contactField)
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Error sending verification code');
+      if (!success) {
+        if (authError) {
+          throw new Error(authError);
+        } else {
+          throw new Error('Failed to send verification code');
+        }
       }
       
       setSuccessMessage('Verification code sent successfully');
@@ -116,16 +111,19 @@ const PhoneLogin = () => {
     try {
       setLoading(true);
       
-      let verifyResult;
-      
+      let success;
       if (verificationType === 'email') {
-        verifyResult = await verifyEmailOTP(contact, otp);
+        success = await verifyEmailOTP(contact, otp);
       } else {
-        verifyResult = await verifyPhoneOTP(contact, otp);
+        success = await verifyPhoneOTP(contact, otp);
       }
       
-      if (!verifyResult) {
-        throw new Error('Invalid verification code');
+      if (!success) {
+        if (authError) {
+          throw new Error(authError);
+        } else {
+          throw new Error('Invalid verification code');
+        }
       }
       
       setSuccessMessage('Verification successful');
@@ -144,24 +142,19 @@ const PhoneLogin = () => {
       setLoading(true);
       setError('');
       
-      const endpoint = verificationType === 'email' 
-        ? '/api/auth/send-email-otp' 
-        : '/api/auth/send-phone-otp';
+      let success;
+      if (verificationType === 'email') {
+        success = await sendEmailOTP(contact);
+      } else {
+        success = await sendPhoneOTP(contact);
+      }
       
-      const contactField = verificationType === 'email' 
-        ? { email: contact } 
-        : { phone: contact };
-      
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(contactField)
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Error resending verification code');
+      if (!success) {
+        if (authError) {
+          throw new Error(authError);
+        } else {
+          throw new Error('Failed to resend verification code');
+        }
       }
       
       setSuccessMessage('Verification code resent successfully');
@@ -171,6 +164,17 @@ const PhoneLogin = () => {
       setError(err.message || 'Failed to resend verification code');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Function to fill test account credentials
+  const fillTestContact = (type) => {
+    if (type === 'phone') {
+      setVerificationType('phone');
+      setContact('9876543210'); // Alex's phone
+    } else if (type === 'email') {
+      setVerificationType('email');
+      setContact('alex@example.com'); // Alex's email
     }
   };
   
@@ -213,6 +217,28 @@ const PhoneLogin = () => {
               <p>
                 Don't have an account? <Link to="/register">Register</Link>
               </p>
+            </div>
+
+            {/* Test Account Information */}
+            <div className="test-accounts">
+              <h3>Test Accounts:</h3>
+              <div className="account-type">
+                <button 
+                  className="fill-test-account" 
+                  onClick={() => fillTestContact('email')}
+                >
+                  Use Test Email (alex@example.com)
+                </button>
+              </div>
+              <div className="account-type">
+                <button 
+                  className="fill-test-account" 
+                  onClick={() => fillTestContact('phone')}
+                >
+                  Use Test Phone (9876543210)
+                </button>
+              </div>
+              <p className="test-note">In dev mode, any 6-digit OTP will work</p>
             </div>
           </div>
         )}
@@ -303,6 +329,17 @@ const PhoneLogin = () => {
                 onClick={() => setStep(2)}
               >
                 Back
+              </button>
+            </div>
+
+            {/* For dev testing */}
+            <div className="test-accounts">
+              <p className="test-note">In dev mode, any 6-digit OTP will work</p>
+              <button 
+                className="fill-test-account" 
+                onClick={() => setOtp('123456')}
+              >
+                Use Test OTP (123456)
               </button>
             </div>
           </form>
