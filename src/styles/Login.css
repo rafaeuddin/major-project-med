@@ -272,4 +272,27 @@
 .fill-test-account:hover {
   background-color: #e6f7ff;
   transform: translateY(-2px);
+}
+
+.alt-login-options {
+  margin: 1.5rem 0;
+  text-align: center;
+  border-top: 1px solid #e9ecef;
+  padding-top: 1.5rem;
+}
+
+.phone-login-link {
+  display: inline-block;
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border: 1px solid #007bff;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.phone-login-link:hover {
+  background-color: #f0f7ff;
+  text-decoration: none;
 } 

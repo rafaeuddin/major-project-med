@@ -9,19 +9,40 @@ const UserSchema = new mongoose.Schema({
     trim: true,
     maxlength: [50, 'Name cannot be more than 50 characters']
   },
+  username: {
+    type: String,
+    required: [true, 'Please add a username'],
+    unique: true,
+    trim: true,
+    minlength: [3, 'Username must be at least 3 characters'],
+    maxlength: [20, 'Username cannot be more than 20 characters']
+  },
   email: {
     type: String,
-    required: [true, 'Please add an email'],
+    sparse: true,
     unique: true,
     match: [
       /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
       'Please add a valid email'
-    ]
+    ],
+    validate: {
+      validator: function() {
+        return this.phone || this.email;
+      },
+      message: 'Either email or phone number is required'
+    }
   },
   phone: {
     type: String,
-    required: [true, 'Please add a phone number'],
-    maxlength: [20, 'Phone number cannot be longer than 20 characters']
+    sparse: true,
+    unique: true,
+    maxlength: [20, 'Phone number cannot be longer than 20 characters'],
+    validate: {
+      validator: function() {
+        return this.phone || this.email;
+      },
+      message: 'Either email or phone number is required'
+    }
   },
   role: {
     type: String,
@@ -54,6 +75,14 @@ const UserSchema = new mongoose.Schema({
     relationship: {
       type: String
     }
+  },
+  isPhoneVerified: {
+    type: Boolean,
+    default: false
+  },
+  isEmailVerified: {
+    type: Boolean,
+    default: false
   },
   createdAt: {
     type: Date,
