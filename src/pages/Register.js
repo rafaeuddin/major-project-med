@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { FaEnvelope, FaPhone, FaUser, FaUserMd, FaEye, FaEyeSlash } from 'react-icons/fa';
 import '../styles/Register.css';
 
 const Register = () => {
-  const { currentUser } = useAuth();
+  const { registerWithEmail, registerWithPhone, currentUser, error: authError } = useAuth();
   const navigate = useNavigate();
   
-  const [step, setStep] = useState(1); // 1: Input form, 2: OTP verification
-  const [registrationType, setRegistrationType] = useState('email'); // 'email' or 'phone'
+  const [contactType, setContactType] = useState('email');
   const [formData, setFormData] = useState({
     name: '',
     username: '',
@@ -19,13 +19,13 @@ const Register = () => {
     role: 'patient'
   });
   
-  const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
-  const [countdown, setCountdown] = useState(0);
-  
+  const [successMsg, setSuccessMsg] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
   useEffect(() => {
+    // If user is already logged in, redirect to dashboard
     if (currentUser) {
       // Redirect based on role
       if (currentUser.role === 'doctor') {
@@ -38,14 +38,6 @@ const Register = () => {
     }
   }, [currentUser, navigate]);
   
-  useEffect(() => {
-    let timer;
-    if (countdown > 0) {
-      timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-    }
-    return () => clearTimeout(timer);
-  }, [countdown]);
-  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -54,62 +46,21 @@ const Register = () => {
     });
   };
   
-  const toggleRegistrationType = () => {
-    setRegistrationType(registrationType === 'email' ? 'phone' : 'email');
-    setError('');
+  const handleContactTypeChange = (type) => {
+    setContactType(type);
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
   
   const validateForm = () => {
-    // Name validation
-    if (!formData.name.trim()) {
-      setError('Name is required');
-      return false;
-    }
+    // Reset errors
+    setError('');
     
-    // Username validation
-    if (!formData.username.trim()) {
-      setError('Username is required');
-      return false;
-    }
-    
-    if (formData.username.length < 3) {
-      setError('Username must be at least 3 characters');
-      return false;
-    }
-    
-    // Email/Phone validation
-    if (registrationType === 'email') {
-      if (!formData.email) {
-        setError('Email is required');
-        return false;
-      }
-      
-      const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-      if (!emailRegex.test(formData.email)) {
-        setError('Please enter a valid email address');
-        return false;
-      }
-    } else {
-      if (!formData.phone) {
-        setError('Phone number is required');
-        return false;
-      }
-      
-      // Simple phone validation - you might want to use a more sophisticated one
-      if (formData.phone.length < 10) {
-        setError('Please enter a valid phone number');
-        return false;
-      }
-    }
-    
-    // Password validation
-    if (!formData.password) {
-      setError('Password is required');
-      return false;
-    }
-    
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+    // Basic validation
+    if (!formData.name || !formData.username || !formData.password || !formData.confirmPassword) {
+      setError('Please fill in all required fields');
       return false;
     }
     
@@ -118,14 +69,39 @@ const Register = () => {
       return false;
     }
     
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters long');
+      return false;
+    }
+    
+    if (contactType === 'email' && !formData.email) {
+      setError('Please enter your email address');
+      return false;
+    }
+    
+    if (contactType === 'phone' && !formData.phone) {
+      setError('Please enter your phone number');
+      return false;
+    }
+    
+    if (contactType === 'email') {
+      const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+      if (!emailRegex.test(formData.email)) {
+        setError('Please enter a valid email address');
+        return false;
+      }
+    }
+    
+    if (contactType === 'phone' && formData.phone.length < 10) {
+      setError('Please enter a valid phone number');
+      return false;
+    }
+    
     return true;
   };
   
-  const handleRegistrationSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    setError('');
-    setSuccessMessage('');
     
     if (!validateForm()) {
       return;
@@ -134,123 +110,32 @@ const Register = () => {
     setLoading(true);
     
     try {
-      const endpoint = registrationType === 'email' 
-        ? '/api/auth/register/email' 
-        : '/api/auth/register/phone';
+      let success;
       
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          username: formData.username,
-          email: registrationType === 'email' ? formData.email : undefined,
-          phone: registrationType === 'phone' ? formData.phone : undefined,
-          password: formData.password,
-          role: formData.role
-        })
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Registration failed');
+      if (contactType === 'email') {
+        success = await registerWithEmail(formData);
+      } else {
+        success = await registerWithPhone(formData);
       }
       
-      setSuccessMessage(data.message);
-      setStep(2);
-      setCountdown(60); // 60 seconds countdown for resend
-      
-    } catch (err) {
-      setError(err.message || 'An error occurred during registration');
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  const handleResendOTP = async () => {
-    if (countdown > 0) return;
-    
-    setError('');
-    setLoading(true);
-    
-    try {
-      const endpoint = registrationType === 'email' 
-        ? '/api/auth/send-email-otp' 
-        : '/api/auth/send-phone-otp';
-      
-      const contactField = registrationType === 'email' 
-        ? { email: formData.email } 
-        : { phone: formData.phone };
-      
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(contactField)
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to resend verification code');
+      if (!success) {
+        if (authError) {
+          throw new Error(authError);
+        } else {
+          throw new Error('Registration failed. Please try again.');
+        }
       }
       
-      setSuccessMessage('Verification code resent successfully');
-      setCountdown(60); // Reset countdown
+      // Registration successful - set success message
+      setSuccessMsg(`Registration successful! Please check your ${contactType} to verify your account.`);
       
-    } catch (err) {
-      setError(err.message || 'Failed to resend verification code');
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  const handleVerifyOTP = async (e) => {
-    e.preventDefault();
-    
-    if (!otp) {
-      return setError('Please enter verification code');
-    }
-    
-    setError('');
-    setLoading(true);
-    
-    try {
-      const endpoint = registrationType === 'email' 
-        ? '/api/auth/verify-email-otp' 
-        : '/api/auth/verify-phone-otp';
-      
-      const contactField = registrationType === 'email' 
-        ? { email: formData.email, otp } 
-        : { phone: formData.phone, otp };
-      
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(contactField)
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Verification failed');
-      }
-      
-      setSuccessMessage('Verification successful! Redirecting to login...');
-      
-      // Redirect to login after 2 seconds
+      // Redirect to verification/login page after 2 seconds
       setTimeout(() => {
         navigate('/login');
       }, 2000);
       
     } catch (err) {
-      setError(err.message || 'Verification failed');
+      setError(err.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -260,43 +145,72 @@ const Register = () => {
     <div className="register-page">
       <div className="register-container">
         <div className="register-header">
-          <h1>Medical Portal</h1>
-          <p>Create a new account</p>
+          <h1>Create an Account</h1>
+          <p>Join our medical portal</p>
         </div>
         
         {error && (
-          <div className="error-alert">
-            {error}
-          </div>
+          <div className="error-alert">{error}</div>
         )}
         
-        {successMessage && (
-          <div className="success-alert">
-            {successMessage}
-          </div>
+        {successMsg && (
+          <div className="success-alert">{successMsg}</div>
         )}
         
-        {step === 1 ? (
-          <form onSubmit={handleRegistrationSubmit} className="register-form">
-            <div className="registration-type-toggle">
-              <button 
+        <form onSubmit={handleSubmit} className="register-form">
+          <div className="contact-type-selector">
+            <p>Register with:</p>
+            <div className="contact-options">
+              <button
                 type="button"
-                className={`toggle-btn ${registrationType === 'email' ? 'active' : ''}`}
-                onClick={() => setRegistrationType('email')}
+                className={`contact-option ${contactType === 'email' ? 'selected' : ''}`}
+                onClick={() => handleContactTypeChange('email')}
               >
-                Register with Email
+                <span className="contact-icon">✉️</span>
+                Email
               </button>
-              <button 
+              <button
                 type="button"
-                className={`toggle-btn ${registrationType === 'phone' ? 'active' : ''}`}
-                onClick={() => setRegistrationType('phone')}
+                className={`contact-option ${contactType === 'phone' ? 'selected' : ''}`}
+                onClick={() => handleContactTypeChange('phone')}
               >
-                Register with Phone
+                <span className="contact-icon">📱</span>
+                Phone
               </button>
             </div>
-            
+          </div>
+          
+          <div className="role-selector">
+            <p>Register as:</p>
+            <div className="role-options">
+              <label className={`role-option ${formData.role === 'patient' ? 'selected' : ''}`}>
+                <input
+                  type="radio"
+                  name="role"
+                  value="patient"
+                  checked={formData.role === 'patient'}
+                  onChange={handleChange}
+                />
+                <div className="role-icon">👤</div>
+                <span>Patient</span>
+              </label>
+              <label className={`role-option ${formData.role === 'doctor' ? 'selected' : ''}`}>
+                <input
+                  type="radio"
+                  name="role"
+                  value="doctor"
+                  checked={formData.role === 'doctor'}
+                  onChange={handleChange}
+                />
+                <div className="role-icon">👨‍⚕️</div>
+                <span>Doctor</span>
+              </label>
+            </div>
+          </div>
+          
+          <div className="form-row">
             <div className="form-group">
-              <label htmlFor="name">Full Name</label>
+              <label htmlFor="name">Full Name*</label>
               <input
                 type="text"
                 id="name"
@@ -309,7 +223,7 @@ const Register = () => {
             </div>
             
             <div className="form-group">
-              <label htmlFor="username">Username</label>
+              <label htmlFor="username">Username*</label>
               <input
                 type="text"
                 id="username"
@@ -320,52 +234,63 @@ const Register = () => {
                 required
               />
             </div>
-            
-            {registrationType === 'email' ? (
-              <div className="form-group">
-                <label htmlFor="email">Email Address</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="Enter your email address"
-                  required
-                />
-              </div>
-            ) : (
-              <div className="form-group">
-                <label htmlFor="phone">Phone Number</label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="Enter your phone number"
-                  required
-                />
-              </div>
-            )}
-            
+          </div>
+          
+          {contactType === 'email' ? (
             <div className="form-group">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="email">Email Address*</label>
               <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
                 onChange={handleChange}
-                placeholder="Create a password"
+                placeholder="Enter your email address"
                 required
               />
             </div>
+          ) : (
+            <div className="form-group">
+              <label htmlFor="phone">Phone Number*</label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                placeholder="Enter your phone number"
+                required
+              />
+            </div>
+          )}
+          
+          <div className="form-row">
+            <div className="form-group password-field">
+              <label htmlFor="password">Password*</label>
+              <div className="password-input-container">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Create a password"
+                  required
+                />
+                <button 
+                  type="button" 
+                  className="toggle-password" 
+                  onClick={togglePasswordVisibility}
+                >
+                  {showPassword ? "👁️" : "👁️‍🗨️"}
+                </button>
+              </div>
+            </div>
             
             <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm Password</label>
+              <label htmlFor="confirmPassword">Confirm Password*</label>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 id="confirmPassword"
                 name="confirmPassword"
                 value={formData.confirmPassword}
@@ -374,108 +299,53 @@ const Register = () => {
                 required
               />
             </div>
-            
-            <div className="form-group">
-              <label>Account Type</label>
-              <div className="role-options">
-                <label className={`role-option ${formData.role === 'patient' ? 'selected' : ''}`}>
-                  <input
-                    type="radio"
-                    name="role"
-                    value="patient"
-                    checked={formData.role === 'patient'}
-                    onChange={handleChange}
-                  />
-                  <div className="role-icon">👤</div>
-                  <span>Patient</span>
-                </label>
-                <label className={`role-option ${formData.role === 'doctor' ? 'selected' : ''}`}>
-                  <input
-                    type="radio"
-                    name="role"
-                    value="doctor"
-                    checked={formData.role === 'doctor'}
-                    onChange={handleChange}
-                  />
-                  <div className="role-icon">👨‍⚕️</div>
-                  <span>Doctor</span>
-                </label>
-              </div>
-            </div>
-            
-            <button 
-              type="submit" 
-              className="register-button"
-              disabled={loading}
-            >
-              {loading ? 'Registering...' : 'Register'}
-            </button>
-            
-            <div className="register-footer">
-              <p>
-                Already have an account? <Link to="/login">Login</Link>
-              </p>
-            </div>
-          </form>
-        ) : (
-          <div className="verification-container">
-            <h2>Verification</h2>
-            <p className="verification-info">
-              {registrationType === 'email' 
-                ? `We've sent a verification code to ${formData.email}`
-                : `We've sent a verification code to ${formData.phone}`
-              }
-            </p>
-            
-            <form onSubmit={handleVerifyOTP} className="verification-form">
-              <div className="form-group">
-                <label htmlFor="otp">Verification Code</label>
-                <input
-                  type="text"
-                  id="otp"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  placeholder="Enter 6-digit code"
-                  maxLength={6}
-                  required
-                />
-              </div>
-              
-              <button 
-                type="submit" 
-                className="verify-button"
-                disabled={loading}
-              >
-                {loading ? 'Verifying...' : 'Verify'}
-              </button>
-            </form>
-            
-            <div className="resend-container">
-              {countdown > 0 ? (
-                <p>Resend code in {countdown} seconds</p>
-              ) : (
-                <button 
-                  type="button" 
-                  className="resend-button"
-                  onClick={handleResendOTP}
-                  disabled={loading}
-                >
-                  Resend Code
-                </button>
-              )}
-            </div>
-            
-            <div className="back-option">
-              <button 
-                type="button" 
-                className="back-button"
-                onClick={() => setStep(1)}
-              >
-                Back to Registration
-              </button>
-            </div>
           </div>
-        )}
+          
+          {formData.role === 'doctor' && (
+            <div className="form-group">
+              <label htmlFor="specialization">Specialization*</label>
+              <select
+                id="specialization"
+                name="specialization"
+                value={formData.specialization || ''}
+                onChange={handleChange}
+                required={formData.role === 'doctor'}
+              >
+                <option value="">Select specialization</option>
+                <option value="General Practitioner">General Practitioner</option>
+                <option value="Cardiology">Cardiology</option>
+                <option value="Dermatology">Dermatology</option>
+                <option value="Neurology">Neurology</option>
+                <option value="Orthopedics">Orthopedics</option>
+                <option value="Pediatrics">Pediatrics</option>
+                <option value="Psychiatry">Psychiatry</option>
+                <option value="Gynecology">Gynecology</option>
+                <option value="Ophthalmology">Ophthalmology</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          )}
+          
+          <div className="form-terms">
+            <p>
+              By registering, you agree to our <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>
+            </p>
+          </div>
+          
+          <button
+            type="submit"
+            className="register-button"
+            disabled={loading}
+          >
+            {loading ? 'Registering...' : 'Register'}
+          </button>
+        </form>
+        
+        <div className="register-footer">
+          <p>
+            Already have an account? <Link to="/login">Login</Link>
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -54,37 +54,15 @@ const Login = () => {
     setError('');
     
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          identifier: formData.identifier,
-          password: formData.password
-        })
-      });
+      // Call the login function from AuthContext
+      const success = await login(formData.identifier, formData.password);
       
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
+      if (!success && authError) {
+        setError(authError);
       }
-      
-      // Store user data and token
-      login(data.token, data.user);
-      
-      // Redirect based on role
-      if (data.user.role === 'doctor') {
-        navigate('/doctor-dashboard');
-      } else if (data.user.role === 'patient') {
-        navigate('/patient-dashboard');
-      } else {
-        navigate('/dashboard');
-      }
-      
     } catch (err) {
-      setError(err.message || 'An error occurred during login');
+      setError('An error occurred during login');
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -94,13 +72,13 @@ const Login = () => {
   const fillTestAccount = (role) => {
     if (role === 'doctor') {
       setFormData({
-        identifier: 'john.smith@example.com',
+        identifier: 'john.smith',
         password: 'password123',
         role: 'doctor'
       });
     } else if (role === 'patient') {
       setFormData({
-        identifier: 'alex@example.com',
+        identifier: 'alex',
         password: 'password123',
         role: 'patient'
       });
@@ -211,7 +189,7 @@ const Login = () => {
           <h3>Test Accounts:</h3>
           <div className="account-type">
             <h4>Doctor:</h4>
-            <p>Email: john.smith@example.com</p>
+            <p>Username: john.smith</p>
             <p>Password: password123</p>
             <button 
               className="fill-test-account" 
@@ -222,7 +200,7 @@ const Login = () => {
           </div>
           <div className="account-type">
             <h4>Patient:</h4>
-            <p>Email: alex@example.com</p>
+            <p>Username: alex</p>
             <p>Password: password123</p>
             <button 
               className="fill-test-account" 

@@ -19,9 +19,9 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   if (requiredRole && currentUser.role !== requiredRole) {
     // Redirect based on actual role
     if (currentUser.role === 'doctor') {
-      return <Navigate to="/doctor/dashboard" />;
+      return <Navigate to="/doctor-dashboard" />;
     } else if (currentUser.role === 'patient') {
-      return <Navigate to="/patient/dashboard" />;
+      return <Navigate to="/patient-dashboard" />;
     } else {
       return <Navigate to="/dashboard" />;
     }

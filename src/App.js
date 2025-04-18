@@ -40,7 +40,7 @@ const App = () => {
             } 
           />
           <Route 
-            path="/doctor/dashboard" 
+            path="/doctor-dashboard" 
             element={
               <ProtectedRoute requiredRole="doctor">
                 <DoctorDashboard />
@@ -48,7 +48,7 @@ const App = () => {
             } 
           />
           <Route 
-            path="/patient/dashboard" 
+            path="/patient-dashboard" 
             element={
               <ProtectedRoute requiredRole="patient">
                 <PatientDashboard />
@@ -69,6 +69,10 @@ const App = () => {
             </ProtectedRoute>
           } />
           
+          {/* Legacy route paths for compatibility */}
+          <Route path="/doctor/dashboard" element={<Navigate to="/doctor-dashboard" />} />
+          <Route path="/patient/dashboard" element={<Navigate to="/patient-dashboard" />} />
+          
           {/* Default route */}
           <Route path="/" element={<Navigate to="/login" />} />
         </Routes>
@@ -86,11 +90,11 @@ const DynamicDashboard = () => {
   }
   
   if (currentUser.role === 'doctor') {
-    return <Navigate to="/doctor/dashboard" />;
+    return <Navigate to="/doctor-dashboard" />;
   }
   
   if (currentUser.role === 'patient') {
-    return <Navigate to="/patient/dashboard" />;
+    return <Navigate to="/patient-dashboard" />;
   }
   
   // Default case (admin, etc.)

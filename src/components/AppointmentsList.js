@@ -13,12 +13,17 @@ const AppointmentsList = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
+        if (!currentUser) return;
+        
+        // Clear previous error if any
+        setError('');
+        
         const response = await authFetch('/api/appointments');
         
         if (response.ok) {
           const data = await response.json();
+          console.log('Appointments loaded:', data.appointments?.length || 0);
           setAppointments(data.appointments || []);
-          setError('');
         } else {
           const errorData = await response.json();
           setError(errorData.message || 'Failed to fetch appointments');
@@ -33,6 +38,8 @@ const AppointmentsList = () => {
 
     if (currentUser) {
       fetchAppointments();
+    } else {
+      setLoading(false);
     }
   }, [currentUser, authFetch]);
 
@@ -65,7 +72,7 @@ const AppointmentsList = () => {
         );
         
         setMessage({
-          text: 'Appointment cancelled successfully',
+          text: data.message || 'Appointment cancelled successfully',
           type: 'success'
         });
       } else {
@@ -86,10 +93,16 @@ const AppointmentsList = () => {
     }
   };
 
-  // Group appointments by status
+  // Group appointments by status and date
   const groupedAppointments = {
-    upcoming: appointments.filter(app => ['scheduled', 'rescheduled'].includes(app.status)),
-    past: appointments.filter(app => ['completed', 'cancelled'].includes(app.status))
+    upcoming: appointments.filter(app => 
+      ['scheduled', 'rescheduled'].includes(app.status) && 
+      new Date(app.date) >= new Date()
+    ),
+    past: appointments.filter(app => 
+      ['completed', 'cancelled'].includes(app.status) || 
+      new Date(app.date) < new Date()
+    )
   };
 
   if (loading) {
@@ -128,11 +141,11 @@ const AppointmentsList = () => {
                 <div className="appointment-with">
                   <strong>{currentUser.role === 'doctor' ? 'Patient' : 'Doctor'}:</strong> {
                     currentUser.role === 'doctor' 
-                      ? appointment.patientId.name 
-                      : appointment.doctorId.name
+                      ? (appointment.patientId?.name || 'Unknown Patient') 
+                      : (appointment.doctorId?.name || 'Unknown Doctor')
                   }
                 </div>
-                {currentUser.role === 'doctor' && (
+                {currentUser.role === 'patient' && appointment.doctorId?.specialization && (
                   <div className="appointment-specialization">
                     <strong>Specialization:</strong> {appointment.doctorId.specialization}
                   </div>
@@ -170,8 +183,8 @@ const AppointmentsList = () => {
                 <div className="appointment-with">
                   <strong>{currentUser.role === 'doctor' ? 'Patient' : 'Doctor'}:</strong> {
                     currentUser.role === 'doctor' 
-                      ? appointment.patientId.name 
-                      : appointment.doctorId.name
+                      ? (appointment.patientId?.name || 'Unknown Patient')
+                      : (appointment.doctorId?.name || 'Unknown Doctor')
                   }
                 </div>
                 <div className="appointment-reason">
