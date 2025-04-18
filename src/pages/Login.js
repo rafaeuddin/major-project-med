@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import '../styles/Login.css';
 
 const Login = () => {
   const { login, currentUser, error: authError } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: '',
+    identifier: '',
     password: '',
     role: 'patient' // Default role is patient
   });
@@ -19,9 +20,9 @@ const Login = () => {
     if (currentUser) {
       // Redirect based on role
       if (currentUser.role === 'doctor') {
-        navigate('/doctor/dashboard');
+        navigate('/doctor-dashboard');
       } else if (currentUser.role === 'patient') {
-        navigate('/patient/dashboard');
+        navigate('/patient-dashboard');
       } else {
         navigate('/dashboard');
       }
@@ -44,7 +45,7 @@ const Login = () => {
     e.preventDefault();
     
     // Validate form
-    if (!formData.email || !formData.password) {
+    if (!formData.identifier || !formData.password) {
       setError('Please fill in all fields');
       return;
     }
@@ -53,14 +54,37 @@ const Login = () => {
     setError('');
     
     try {
-      const success = await login(formData.email, formData.password, formData.role);
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          identifier: formData.identifier,
+          password: formData.password
+        })
+      });
       
-      if (!success) {
-        setError(authError || 'Login failed');
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
       }
+      
+      // Store user data and token
+      login(data.token, data.user);
+      
+      // Redirect based on role
+      if (data.user.role === 'doctor') {
+        navigate('/doctor-dashboard');
+      } else if (data.user.role === 'patient') {
+        navigate('/patient-dashboard');
+      } else {
+        navigate('/dashboard');
+      }
+      
     } catch (err) {
-      setError('An error occurred during login');
-      console.error(err);
+      setError(err.message || 'An error occurred during login');
     } finally {
       setLoading(false);
     }
@@ -70,13 +94,13 @@ const Login = () => {
   const fillTestAccount = (role) => {
     if (role === 'doctor') {
       setFormData({
-        email: 'john.smith@example.com',
+        identifier: 'john.smith@example.com',
         password: 'password123',
         role: 'doctor'
       });
     } else if (role === 'patient') {
       setFormData({
-        email: 'alex@example.com',
+        identifier: 'alex@example.com',
         password: 'password123',
         role: 'patient'
       });
@@ -127,14 +151,14 @@ const Login = () => {
           </div>
           
           <div className="form-group">
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="identifier">Username, Email or Phone</label>
             <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
+              type="text"
+              id="identifier"
+              name="identifier"
+              value={formData.identifier}
               onChange={handleChange}
-              placeholder="Enter your email"
+              placeholder="Enter your username, email, or phone"
               required
             />
           </div>
@@ -168,6 +192,12 @@ const Login = () => {
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
+          
+          <div className="alt-login-options">
+            <Link to="/phone-login" className="phone-login-link">
+              Login with OTP
+            </Link>
+          </div>
         </form>
         
         <div className="login-footer">

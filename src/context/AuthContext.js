@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
 const AuthContext = createContext();
 
@@ -6,281 +6,176 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
+  const [token, setToken] = useState(localStorage.getItem('token') || '');
 
-  // Test accounts for development
-  const testAccounts = {
-    'john.smith@example.com': {
-      _id: 'doctor123',
-      name: 'Dr. John Smith',
-      email: 'john.smith@example.com',
-      role: 'doctor',
-      password: 'password123',
-      specialization: 'Cardiology',
-      phone: '1234567890'
-    },
-    'alex@example.com': {
-      _id: 'patient123',
-      name: 'Alex Johnson',
-      email: 'alex@example.com',
-      role: 'patient',
-      password: 'password123',
-      phone: '9876543210',
-      medicalHistory: [
-        {
-          title: 'Annual Checkup',
-          description: 'Regular checkup, all vitals normal',
-          date: '2023-01-15'
-        }
-      ],
-      emergencyContact: {
-        name: 'Sarah Johnson',
-        phone: '5551234567',
-        relationship: 'Spouse'
-      }
-    }
-  };
-
+  // Check if user is logged in on initial load
   useEffect(() => {
-    // Check if there's a token in localStorage and fetch user data
-    const fetchUser = async () => {
-      if (token) {
-        try {
-          // For a real app, we would fetch from the server
-          // const response = await fetch('/api/users/me', {
-          //   headers: {
-          //     Authorization: `Bearer ${token}`
-          //   }
-          // });
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
 
-          // For development with test accounts
-          const userData = JSON.parse(localStorage.getItem('currentUser'));
-          if (userData) {
-            setCurrentUser(userData);
-          } else {
-            logout();
-          }
-        } catch (error) {
-          console.error('Error fetching user data:', error);
-          setError('Failed to authenticate user');
-          logout();
-        }
-      }
-      setLoading(false);
-    };
-
-    fetchUser();
-  }, [token]);
-
-  // Login function with role parameter
-  const login = async (email, password, role) => {
-    setLoading(true);
-    setError(null);
+    if (token && user) {
+      setToken(token);
+      setCurrentUser(JSON.parse(user));
+    }
     
-    try {
-      // For development with test accounts
-      const testUser = testAccounts[email];
-      
-      if (testUser && testUser.password === password) {
-        // Check if role matches
-        if (testUser.role !== role) {
-          setError(`The selected role does not match this account. This is a ${testUser.role} account.`);
-          setLoading(false);
-          return false;
-        }
-        
-        // Generate a mock token
-        const mockToken = `mock-token-${Date.now()}`;
-        localStorage.setItem('token', mockToken);
-        localStorage.setItem('currentUser', JSON.stringify(testUser));
-        localStorage.setItem('userRole', testUser.role);
-        
-        setToken(mockToken);
-        setCurrentUser(testUser);
-        
-        return true;
-      }
-      
-      // For a real app, we would make an API call
-      // const response = await fetch('/api/users/login', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json'
-      //   },
-      //   body: JSON.stringify({ email, password, role })
-      // });
-      
-      // const data = await response.json();
-      
-      // if (response.ok) {
-      //   localStorage.setItem('token', data.token);
-      //   setToken(data.token);
-      //   
-      //   // Store user role in localStorage for persistence
-      //   localStorage.setItem('userRole', data.user.role);
-      //   
-      //   // Set current user with data from response
-      //   setCurrentUser(data.user);
-      //   
-      //   return true;
-      // }
+    setLoading(false);
+  }, []);
 
-      // If we reach here with test accounts, credentials are invalid
-      setError('Invalid email or password');
-      return false;
+  // Fetch user data from token
+  const fetchUserData = async () => {
+    if (!token) return null;
+
+    try {
+      const response = await authFetch('/api/auth/me');
+      if (response.ok) {
+        const data = await response.json();
+        return data.data;
+      }
+      return null;
     } catch (error) {
-      console.error('Login error:', error);
-      setError('An error occurred during login');
-      return false;
-    } finally {
-      setLoading(false);
+      console.error('Error fetching user data:', error);
+      return null;
     }
   };
 
-  // Register function
-  const register = async (userData) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      // For development with test accounts
-      // Check if email already exists
-      if (testAccounts[userData.email]) {
-        setError('Email already exists');
-        return false;
-      }
-      
-      // Create a new test user
-      const newUser = {
-        _id: `user${Date.now()}`,
-        ...userData
-      };
-      
-      // Update test accounts (this is just for demo, in a real app we'd persist to a database)
-      // testAccounts[userData.email] = newUser;
-      
-      // Generate a mock token
-      const mockToken = `mock-token-${Date.now()}`;
-      localStorage.setItem('token', mockToken);
-      localStorage.setItem('currentUser', JSON.stringify(newUser));
-      localStorage.setItem('userRole', newUser.role);
-      
-      setToken(mockToken);
-      setCurrentUser(newUser);
-      
-      return true;
-      
-      // For a real app, we would make an API call
-      // const response = await fetch('/api/users/register', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json'
-      //   },
-      //   body: JSON.stringify(userData)
-      // });
-      // 
-      // const data = await response.json();
-      // 
-      // if (response.ok) {
-      //   localStorage.setItem('token', data.token);
-      //   setToken(data.token);
-      //   
-      //   // Store user role in localStorage for persistence
-      //   localStorage.setItem('userRole', data.user.role);
-      //   
-      //   // Set current user with data from response
-      //   setCurrentUser(data.user);
-      //   
-      //   return true;
-      // } else {
-      //   setError(data.msg || 'Registration failed');
-      //   return false;
-      // }
-    } catch (error) {
-      console.error('Registration error:', error);
-      setError('An error occurred during registration');
-      return false;
-    } finally {
-      setLoading(false);
-    }
+  // Login function - called with token and user from API
+  const login = (authToken, user) => {
+    localStorage.setItem('token', authToken);
+    localStorage.setItem('user', JSON.stringify(user));
+    setToken(authToken);
+    setCurrentUser(user);
+    return true;
   };
 
   // Logout function
   const logout = () => {
     localStorage.removeItem('token');
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('currentUser');
-    setToken(null);
+    localStorage.removeItem('user');
+    setToken('');
     setCurrentUser(null);
   };
 
-  // Helper function for authenticated API requests
+  // Reusable fetch function with auth token
   const authFetch = async (url, options = {}) => {
-    if (!token) {
-      throw new Error('No authentication token');
-    }
-
-    const authOptions = {
-      ...options,
-      headers: {
-        ...options.headers,
-        Authorization: `Bearer ${token}`
-      }
+    const headers = {
+      'Content-Type': 'application/json',
+      ...options.headers,
     };
 
-    // For a real app, we would make an actual API call
-    // const response = await fetch(url, authOptions);
-    
-    // For development with test accounts, we'll mock responses
-    let response;
-    
-    // Mock appointment data
-    if (url === '/api/appointments') {
-      const mockAppointments = {
-        appointments: [
-          {
-            _id: 'appt1',
-            patientId: testAccounts['alex@example.com'],
-            doctorId: testAccounts['john.smith@example.com'],
-            date: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
-            timeSlot: '10:00 AM',
-            reason: 'Annual checkup',
-            status: 'scheduled'
-          },
-          {
-            _id: 'appt2',
-            patientId: testAccounts['alex@example.com'],
-            doctorId: testAccounts['john.smith@example.com'],
-            date: new Date(Date.now() - 86400000).toISOString(), // Yesterday
-            timeSlot: '02:00 PM',
-            reason: 'Follow-up',
-            status: 'completed',
-            notes: 'Patient is recovering well'
-          }
-        ]
-      };
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    const config = {
+      ...options,
+      headers,
+    };
+
+    return fetch(url, config);
+  };
+
+  // Register with email
+  const registerWithEmail = async (formData) => {
+    try {
+      setError('');
+      const response = await fetch('/api/auth/register/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
       
-      response = {
-        ok: true,
-        json: async () => mockAppointments
-      };
-    } else {
-      // Default mock response
-      response = {
-        ok: true,
-        json: async () => ({ message: 'Mock response' })
-      };
+      const data = await response.json();
+      
+      if (!response.ok) {
+        setError(data.message || 'Registration failed');
+        return false;
+      }
+      
+      return true;
+    } catch (err) {
+      setError('An error occurred during registration');
+      console.error(err);
+      return false;
     }
-    
-    if (response.status === 401) {
-      // Token expired or invalid
-      logout();
-      throw new Error('Session expired. Please login again.');
+  };
+
+  // Register with phone
+  const registerWithPhone = async (formData) => {
+    try {
+      setError('');
+      const response = await fetch('/api/auth/register/phone', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        setError(data.message || 'Registration failed');
+        return false;
+      }
+      
+      return true;
+    } catch (err) {
+      setError('An error occurred during registration');
+      console.error(err);
+      return false;
     }
-    
-    return response;
+  };
+
+  // Verify email OTP
+  const verifyEmailOTP = async (email, otp) => {
+    try {
+      setError('');
+      const response = await fetch('/api/auth/verify-email-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        setError(data.message || 'Verification failed');
+        return false;
+      }
+      
+      login(data.token, data.user);
+      return true;
+    } catch (err) {
+      setError('An error occurred during verification');
+      console.error(err);
+      return false;
+    }
+  };
+
+  // Verify phone OTP
+  const verifyPhoneOTP = async (phone, otp) => {
+    try {
+      setError('');
+      const response = await fetch('/api/auth/verify-phone-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, otp })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        setError(data.message || 'Verification failed');
+        return false;
+      }
+      
+      login(data.token, data.user);
+      return true;
+    } catch (err) {
+      setError('An error occurred during verification');
+      console.error(err);
+      return false;
+    }
   };
 
   const value = {
@@ -288,9 +183,12 @@ export const AuthProvider = ({ children }) => {
     loading,
     error,
     login,
-    register,
     logout,
-    authFetch
+    authFetch,
+    registerWithEmail,
+    registerWithPhone,
+    verifyEmailOTP,
+    verifyPhoneOTP
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

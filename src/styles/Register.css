@@ -1,21 +1,20 @@
 .register-page {
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   background-color: #f5f7fa;
   padding: 20px;
-  position: relative;
 }
 
 .register-container {
   width: 100%;
-  max-width: 560px;
+  max-width: 580px;
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   padding: 30px;
+  margin: 20px 0;
 }
 
 .register-header {
@@ -34,24 +33,88 @@
   font-size: 16px;
 }
 
+.error-alert {
+  background-color: #fbe9e7;
+  color: #d32f2f;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  border-left: 4px solid #d32f2f;
+}
+
+.success-alert {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  border-left: 4px solid #2e7d32;
+}
+
+.registration-type-toggle {
+  display: flex;
+  margin-bottom: 25px;
+  gap: 10px;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #ddd;
+  background-color: #f5f7fa;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.toggle-btn.active {
+  background-color: #3498db;
+  color: white;
+  border-color: #3498db;
+}
+
+.toggle-btn:hover:not(.active) {
+  background-color: #eaeaea;
+}
+
 .register-form {
   margin-bottom: 20px;
 }
 
-/* Role selector (reusing from Login.css) */
-.role-selector {
-  margin-bottom: 25px;
+.form-group {
+  margin-bottom: 20px;
 }
 
-.role-selector p {
-  margin-bottom: 10px;
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
   color: #2a3f54;
   font-weight: 500;
 }
 
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Role selector styles */
 .role-options {
   display: flex;
   gap: 15px;
+  margin-top: 8px;
 }
 
 .role-option {
@@ -93,56 +156,10 @@
   transform: translateY(-2px);
 }
 
-/* Form groups */
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 6px;
-  color: #2a3f54;
-  font-weight: 500;
-}
-
-.form-group input {
+.register-button, .verify-button {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
-}
-
-.form-group input:focus {
-  outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-}
-
-/* Form rows for side-by-side fields */
-.form-row {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-.form-row .form-group {
-  flex: 1;
-  margin-bottom: 0;
-}
-
-/* Doctor-specific fields */
-.doctor-fields {
-  background-color: #f8fafc;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 25px;
-  border-left: 4px solid #3498db;
-}
-
-.register-button {
-  width: 100%;
-  padding: 12px;
+  padding: 14px;
+  margin-top: 10px;
   background-color: #3498db;
   color: white;
   border: none;
@@ -153,11 +170,11 @@
   transition: background-color 0.2s;
 }
 
-.register-button:hover {
+.register-button:hover, .verify-button:hover {
   background-color: #2980b9;
 }
 
-.register-button:disabled {
+.register-button:disabled, .verify-button:disabled {
   background-color: #b3d7f0;
   cursor: not-allowed;
 }
@@ -166,7 +183,7 @@
   text-align: center;
   border-top: 1px solid #eee;
   padding-top: 20px;
-  margin-top: 30px;
+  margin-top: 20px;
 }
 
 .register-footer p {
@@ -184,18 +201,83 @@
   text-decoration: underline;
 }
 
-.error-alert {
-  background-color: #fbe9e7;
-  color: #d32f2f;
-  padding: 12px;
+/* Verification styles */
+.verification-container {
+  text-align: center;
+}
+
+.verification-container h2 {
+  color: #2a3f54;
+  margin-bottom: 20px;
+}
+
+.verification-info {
+  background-color: #e3f2fd;
+  padding: 15px;
   border-radius: 4px;
   margin-bottom: 20px;
+  color: #0d47a1;
+}
+
+.verification-form {
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.resend-container {
+  margin: 20px 0;
+}
+
+.resend-container p {
+  color: #73879c;
   font-size: 14px;
-  border-left: 4px solid #d32f2f;
+}
+
+.resend-button {
+  background: none;
+  border: none;
+  color: #3498db;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+.resend-button:hover {
+  text-decoration: underline;
+}
+
+.resend-button:disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.back-option {
+  margin-top: 20px;
+}
+
+.back-button {
+  background: none;
+  border: 1px solid #ddd;
+  color: #73879c;
+  padding: 10px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.back-button:hover {
+  background-color: #f5f7fa;
+  color: #2a3f54;
 }
 
 /* Responsive adjustments */
 @media (max-width: 480px) {
+  .register-container {
+    padding: 20px;
+  }
+  
   .role-options {
     flex-direction: column;
   }
@@ -212,9 +294,8 @@
     margin-right: 10px;
   }
   
-  .form-row {
+  .registration-type-toggle {
     flex-direction: column;
-    gap: 20px;
   }
 }
 

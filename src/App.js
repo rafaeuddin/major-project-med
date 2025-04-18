@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import AppointmentForm from './pages/AppointmentForm';
 import DoctorDashboard from './pages/DoctorDashboard';
 import PatientDashboard from './pages/PatientDashboard';
+import PhoneLogin from './pages/PhoneLogin';
 
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
@@ -27,6 +28,7 @@ const App = () => {
           {/* Public routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/phone-login" element={<PhoneLogin />} />
           
           {/* Protected routes */}
           <Route 
