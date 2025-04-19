@@ -416,4 +416,15 @@ tr.selected {
 .back-button:hover {
   background-color: rgba(52, 152, 219, 0.1);
   transform: translateX(-5px);
+}
+
+/* Prescription Button */
+.prescription-button {
+  background-color: #3498db;
+  color: white;
+  margin-right: 10px;
+}
+
+.prescription-button:hover {
+  background-color: #2980b9;
 } 

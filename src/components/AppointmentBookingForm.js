@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useLocation } from 'react-router-dom';
 import CalendarComponent from './CalendarComponent';
 
 const AppointmentBookingForm = () => {
   const { currentUser, authFetch } = useAuth();
+  const location = useLocation();
+  const recommendedSpecialty = location.state?.recommendedSpecialty || '';
+  
   const [doctors, setDoctors] = useState([]);
+  const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedDoctor, setSelectedDoctor] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -21,18 +26,50 @@ const AppointmentBookingForm = () => {
         if (response.ok) {
           const data = await response.json();
           setDoctors(data);
+          
+          // If we have a recommended specialty from the chatbot, filter doctors
+          if (recommendedSpecialty) {
+            const filtered = data.filter(doctor => 
+              doctor.specialization && 
+              doctor.specialization.toLowerCase().includes(recommendedSpecialty.toLowerCase())
+            );
+            
+            setFilteredDoctors(filtered.length > 0 ? filtered : data);
+            
+            // Auto-select first matching doctor if available
+            if (filtered.length > 0) {
+              setSelectedDoctor(filtered[0]._id);
+              setReason(prev => prev || `Consultation with ${recommendedSpecialty} specialist as recommended by Dr. AI`);
+            }
+            
+            // Add a message about the recommendation
+            setMessage({
+              text: `Based on your symptoms, we've filtered doctors specializing in ${recommendedSpecialty}.`,
+              type: 'info'
+            });
+          } else {
+            setFilteredDoctors(data);
+          }
         } else {
           console.error('Failed to fetch doctors');
+          setMessage({
+            text: 'Failed to load doctors. Please try again later.',
+            type: 'error'
+          });
         }
       } catch (error) {
         console.error('Error fetching doctors:', error);
+        setMessage({
+          text: 'Error connecting to the server. Please try again later.',
+          type: 'error'
+        });
       } finally {
         setLoading(false);
       }
     };
 
     fetchDoctors();
-  }, []);
+  }, [recommendedSpecialty]);
 
   const handleDoctorChange = (e) => {
     setSelectedDoctor(e.target.value);
@@ -72,7 +109,7 @@ const AppointmentBookingForm = () => {
         reason
       };
 
-      const response = await authFetch('/api/appointments/book', {
+      const response = await authFetch('/api/appointments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -132,7 +169,7 @@ const AppointmentBookingForm = () => {
             required
           >
             <option value="">-- Select a Doctor --</option>
-            {doctors.map(doctor => (
+            {filteredDoctors.map(doctor => (
               <option key={doctor._id} value={doctor._id}>
                 Dr. {doctor.name} - {doctor.specialization}
               </option>

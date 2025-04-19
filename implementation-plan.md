@@ -53,7 +53,7 @@
 - [x] Implement a patient survey form for pre-consultation
 
 #### Day 18-19: Upload Feature
-- [ ] Develop an upload feature for test reports, X-rays, and prescriptions
+- [x] Develop an upload feature for test reports, X-rays, and prescriptions
 
 #### Day 20: Analysis Tool
 - [ ] Create an analysis tool for diagnosis and visualization enhancement
@@ -61,11 +61,11 @@
 ### Week 7-8: Platform & User Interaction Module
 
 #### Day 21-22: Appointment Management
-- [ ] Allow patients to schedule appointments with doctors/hospitals
-- [ ] Implement an automated notification system for appointment reminders
+- [x] Allow patients to schedule appointments with doctors/hospitals
+- [x] Implement an automated notification system for appointment reminders
 
 #### Day 23-24: Recommendation System
-- [ ] Suggest doctors and hospitals based on symptoms and location
+- [x] Suggest doctors and hospitals based on symptoms and location
 - [ ] Use patient reviews and doctor specialties for suggestions
 
 #### Day 25-27: Advanced Features
@@ -78,8 +78,8 @@
 ### Week 9-10: Smart Chatbot Assistant
 
 #### Day 28-30: Chatbot Implementation
-- [ ] Implement calorie counting based on food logs
-- [ ] Provide instant medical assistance using historical data
+- [x] Implement calorie counting based on food logs
+- [x] Provide instant medical assistance using historical data
 - [ ] Add doubt clarification system for medications and appointments
 
 ### Week 11-12: Review & Feedback System

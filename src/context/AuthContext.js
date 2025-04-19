@@ -108,7 +108,71 @@ export const AuthProvider = ({ children }) => {
       headers,
     };
 
-    return fetch(url, config);
+    // Create an abort controller for timeout (use a shorter timeout)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+    
+    try {
+      console.log(`Making request to ${url}`);
+      const startTime = Date.now();
+      
+      // If we're in development mode and the URL is one of the problematic ones,
+      // log extra information and use a more direct approach
+      if (DEV_MODE && (url.includes('/api/appointments/user') || url.includes('/api/patients/profile'))) {
+        console.log(`Special handling for potentially problematic endpoint: ${url}`);
+        
+        try {
+          clearTimeout(timeoutId);
+          
+          // Use basic fetch with minimal options
+          const directResponse = await fetch(url, {
+            method: options.method || 'GET',
+            headers: headers,
+            cache: 'no-cache' // Prevent caching issues
+          });
+          
+          console.log(`Direct response from ${url} in ${Date.now() - startTime}ms:`, directResponse.status);
+          return directResponse;
+        } catch (directError) {
+          console.error(`Direct fetch to ${url} failed:`, directError);
+          // Continue to normal flow if direct fetch fails
+        }
+      }
+      
+      const response = await fetch(url, {
+        ...config,
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      console.log(`Response from ${url} in ${Date.now() - startTime}ms:`, response.status);
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      
+      if (error.name === 'AbortError') {
+        console.error(`Request to ${url} timed out after 3 seconds`);
+        // Create a Response object to handle timeout errors
+        return new Response(
+          JSON.stringify({ 
+            message: 'Request timed out. Please try again later.',
+            success: false 
+          }),
+          { status: 504, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      console.error(`Fetch to ${url} failed:`, error);
+      
+      // Create a generic error response
+      return new Response(
+        JSON.stringify({ 
+          message: 'Network error occurred. Please check your connection.',
+          success: false 
+        }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
   };
 
   // Handle login with identifier (username/email/phone) and password
@@ -146,9 +210,27 @@ export const AuthProvider = ({ children }) => {
           setError('Invalid password');
           return false;
         }
+        
+        // If no matching test account but we're in dev mode, try the mock API
+        // This will allow our mock doctor login to work
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: identifier, password })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          setError(data.message || 'Login failed');
+          return false;
+        }
+        
+        login(data.token, data.user);
+        return true;
       }
       
-      // If not in dev mode or no matching test account, try regular API
+      // If not in dev mode, try regular API
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

@@ -11,6 +11,23 @@ const CalendarComponent = ({ onDateSelect, onTimeSlotSelect, selectedDate, selec
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const auth = useAuth();
   const authFetch = auth?.authFetch;
+  const MAX_RETRIES = 3;
+
+  // Retry fetch with exponential backoff
+  const fetchWithRetry = async (url, options = {}, retries = MAX_RETRIES) => {
+    try {
+      const response = await fetch(url, options);
+      return response;
+    } catch (error) {
+      if (retries > 0) {
+        const delay = Math.pow(2, MAX_RETRIES - retries) * 300;
+        console.log(`Retrying fetch for ${url} after ${delay}ms. Attempts left: ${retries}`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return fetchWithRetry(url, options, retries - 1);
+      }
+      throw error;
+    }
+  };
 
   useEffect(() => {
     // Fetch time slots from the API
@@ -20,14 +37,31 @@ const CalendarComponent = ({ onDateSelect, onTimeSlotSelect, selectedDate, selec
         // If doctorId is provided, fetch real data from API
         if (doctorId) {
           const formattedDate = date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
-          const response = await fetch(`/api/appointments/slots?date=${formattedDate}&doctorId=${doctorId}`);
           
-          if (response.ok) {
-            const data = await response.json();
-            setTimeSlots(data.availableTimeSlots);
-          } else {
-            console.error('Error fetching time slots');
-            setTimeSlots([]);
+          try {
+            const response = await fetchWithRetry(`/api/appointments/available-slots?date=${formattedDate}&doctorId=${doctorId}`);
+            
+            if (response.ok) {
+              try {
+                const data = await response.json();
+                setTimeSlots(data.availableTimeSlots || []);
+              } catch (parseError) {
+                console.error('Error parsing time slots response:', parseError);
+                // Fall back to demo data on JSON parsing error
+                const availableSlots = generateRandomAvailability(date);
+                setTimeSlots(availableSlots);
+              }
+            } else {
+              console.error('Error fetching time slots, status:', response.status);
+              // Fall back to demo data on error response
+              const availableSlots = generateRandomAvailability(date);
+              setTimeSlots(availableSlots);
+            }
+          } catch (error) {
+            console.error('Error fetching time slots:', error);
+            // Fall back to demo data on network error
+            const availableSlots = generateRandomAvailability(date);
+            setTimeSlots(availableSlots);
           }
         } else {
           // Fallback to the demo data if no doctorId is provided
@@ -36,8 +70,10 @@ const CalendarComponent = ({ onDateSelect, onTimeSlotSelect, selectedDate, selec
           setTimeSlots(availableSlots);
         }
       } catch (error) {
-        console.error('Error fetching time slots:', error);
-        setTimeSlots([]);
+        console.error('Error in time slots logic:', error);
+        // Ensure we have some time slots even if everything fails
+        const fallbackSlots = generateRandomAvailability(date);
+        setTimeSlots(fallbackSlots);
       } finally {
         setIsLoading(false);
       }

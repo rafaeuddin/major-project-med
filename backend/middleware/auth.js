@@ -43,6 +43,4 @@ exports.authorize = (...roles) => {
     }
     next();
   };
-};
-
-module.exports = { isAuthenticated, authorize }; 
+}; 

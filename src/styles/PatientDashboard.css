@@ -1,0 +1,472 @@
+/* PatientDashboard Styles */
+.patient-dashboard {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.8rem;
+}
+
+.patient-info {
+  display: flex;
+  align-items: center;
+}
+
+.patient-name {
+  font-weight: 600;
+  margin-right: 15px;
+  color: #34495e;
+}
+
+.logout-button {
+  background-color: transparent;
+  border: 1px solid #e74c3c;
+  color: #e74c3c;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.logout-button:hover {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.dashboard-content {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.dashboard-tabs {
+  display: flex;
+  background-color: #f0f2f5;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.tab-button {
+  background: transparent;
+  border: none;
+  padding: 15px 20px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #7f8c8d;
+  position: relative;
+  transition: all 0.3s;
+}
+
+.tab-button:hover {
+  color: #3498db;
+}
+
+.tab-button.active {
+  color: #3498db;
+  font-weight: 600;
+}
+
+.tab-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #3498db;
+}
+
+.dashboard-tab-content {
+  padding: 25px;
+}
+
+.tab-actions {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.book-appointment-button, 
+.add-food-log-button, 
+.view-reports-button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+  transition: all 0.3s;
+}
+
+.book-appointment-button:hover, 
+.add-food-log-button:hover, 
+.view-reports-button:hover {
+  background-color: #2980b9;
+}
+
+.no-data-message {
+  text-align: center;
+  padding: 40px 20px;
+  color: #95a5a6;
+}
+
+.no-data-message i {
+  font-size: 3rem;
+  margin-bottom: 10px;
+  color: #bdc3c7;
+}
+
+.back-button-container {
+  margin-bottom: 20px;
+}
+
+.back-button {
+  background-color: transparent;
+  border: none;
+  color: #7f8c8d;
+  padding: 5px 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+}
+
+.back-button:hover {
+  color: #3498db;
+}
+
+/* Medical Records Styles */
+.medical-tab h2, .medical-tab h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.medical-tab h3 {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.medical-documents-section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  margin-bottom: 20px;
+}
+
+.documents-uploader {
+  margin-bottom: 20px;
+}
+
+.documents-viewer {
+  margin-bottom: 20px;
+}
+
+.medical-history-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.medical-record-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s;
+}
+
+.medical-record-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.medical-record-card h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #2c3e50;
+  padding-top: 0;
+  border-top: none;
+}
+
+.record-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  font-size: 0.85rem;
+  color: #7f8c8d;
+}
+
+/* Loading State */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  color: #7f8c8d;
+  font-size: 1.1rem;
+}
+
+/* Error Message */
+.error-message {
+  text-align: center;
+  color: #e74c3c;
+  padding: 40px 20px;
+  font-size: 1.1rem;
+}
+
+/* Nutrition Tab Styles */
+.nutrition-tab h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.nutrition-actions {
+  display: flex;
+  margin-bottom: 25px;
+}
+
+.add-food-log-button {
+  background-color: #27ae60;
+}
+
+.add-food-log-button:hover {
+  background-color: #219653;
+}
+
+.view-reports-button {
+  background-color: #f39c12;
+}
+
+.view-reports-button:hover {
+  background-color: #d35400;
+}
+
+.loading-nutrition {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.loading-spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: #3498db;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.nutrition-error {
+  text-align: center;
+  padding: 30px;
+  color: #e74c3c;
+}
+
+.nutrition-error button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  margin-top: 15px;
+  cursor: pointer;
+}
+
+.nutrition-error button:hover {
+  background-color: #c0392b;
+}
+
+.nutrition-summary {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+}
+
+.nutrition-overview {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.nutrition-overview h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #2c3e50;
+  font-size: 1.2rem;
+}
+
+.nutrition-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+}
+
+.stat-card {
+  background-color: white;
+  padding: 15px;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  margin-bottom: 5px;
+}
+
+.stat-value {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.recent-logs {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.recent-logs h3 {
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 15px 20px;
+  color: #2c3e50;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 1.2rem;
+}
+
+.daily-summaries {
+  padding: 0;
+}
+
+.day-summary {
+  padding: 15px 20px;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+.day-summary:last-child {
+  border-bottom: none;
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.day-header h4 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1rem;
+}
+
+.total-calories {
+  font-weight: 600;
+  color: #e74c3c;
+}
+
+.macros-breakdown {
+  display: flex;
+  gap: 15px;
+}
+
+.macro {
+  display: flex;
+  flex-direction: column;
+}
+
+.macro-label {
+  font-size: 0.8rem;
+  color: #95a5a6;
+}
+
+.macro-value {
+  font-weight: 500;
+  color: #34495e;
+}
+
+.no-nutrition-data {
+  text-align: center;
+  padding: 30px;
+  color: #7f8c8d;
+}
+
+.no-nutrition-data p:first-child {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+/* Media query for larger screens */
+@media (min-width: 1024px) {
+  .medical-documents-section {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+  .medical-documents-section {
+    grid-template-columns: 1fr;
+  }
+  
+  .documents-uploader,
+  .documents-viewer {
+    width: 100%;
+  }
+  
+  .dashboard-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .tab-button {
+    flex: 1;
+    min-width: 120px;
+    padding: 12px 15px;
+    font-size: 0.9rem;
+  }
+  
+  .nutrition-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .macros-breakdown {
+    justify-content: space-between;
+    width: 100%;
+  }
+} 
