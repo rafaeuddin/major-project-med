@@ -9,21 +9,21 @@
 - [x] Initialize version control with Git
 
 #### Day 3-4: Authentication System - Part 1
-- [ ] Implement phone number-based authentication
+- [x] Implement phone number-based authentication
 - [ ] Set up OTP verification system
 
 #### Day 5: Authentication System - Part 2
-- [ ] Implement JWT token for session management
-- [ ] Set up role-based access control (Patient/Doctor/Staff)
+- [x] Implement JWT token for session management
+- [x] Set up role-based access control (Patient/Doctor/Staff)
 
 ### Week 2: User Profiles
 
 #### Day 6-7: Patient Profile
 - [ ] Develop basic information and medical history sections
-- [ ] Implement emergency contacts and document uploads
+- [x] Implement emergency contacts and document uploads
 
 #### Day 8-9: Doctor Profile
-- [ ] Develop specialization and available time slots sections
+- [x] Develop specialization and available time slots sections
 - [ ] Implement consultation fees and professional details
 
 ## Phase 2: Core Features (3-4 weeks)
@@ -50,7 +50,7 @@
 ### Week 5-6: Document Upload & Analysis System
 
 #### Day 16-17: Patient Survey Form
-- [ ] Implement a patient survey form for pre-consultation
+- [x] Implement a patient survey form for pre-consultation
 
 #### Day 18-19: Upload Feature
 - [ ] Develop an upload feature for test reports, X-rays, and prescriptions
