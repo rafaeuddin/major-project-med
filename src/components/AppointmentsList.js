@@ -8,6 +8,25 @@ const AppointmentsList = () => {
   const [error, setError] = useState('');
   const [actionInProgress, setActionInProgress] = useState(null);
   const [message, setMessage] = useState({ text: '', type: '' });
+  const [retryCount, setRetryCount] = useState(0);
+  const MAX_RETRIES = 3;
+
+  // Function to retry fetching with exponential backoff
+  const fetchWithRetry = async (url, options = {}, attempt = 0) => {
+    try {
+      const response = await authFetch(url, options);
+      return response;
+    } catch (error) {
+      if (attempt < MAX_RETRIES) {
+        // Exponential backoff: wait longer between each retry
+        const delay = Math.pow(2, attempt) * 500;
+        console.log(`Retry ${attempt + 1}/${MAX_RETRIES} after ${delay}ms for ${url}`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return fetchWithRetry(url, options, attempt + 1);
+      }
+      throw error;
+    }
+  };
 
   // Fetch user appointments
   useEffect(() => {
@@ -18,19 +37,39 @@ const AppointmentsList = () => {
         // Clear previous error if any
         setError('');
         
-        const response = await authFetch('/api/appointments');
+        const response = await fetchWithRetry('/api/appointments/user');
         
         if (response.ok) {
-          const data = await response.json();
-          console.log('Appointments loaded:', data.appointments?.length || 0);
-          setAppointments(data.appointments || []);
+          try {
+            const data = await response.json();
+            console.log('Appointments loaded:', data.appointments?.length || 0);
+            setAppointments(data.appointments || []);
+            setRetryCount(0); // Reset retry count on success
+          } catch (parseError) {
+            console.error('Error parsing appointments JSON:', parseError);
+            setError('Could not process the appointment data. Please try again later.');
+          }
         } else {
-          const errorData = await response.json();
-          setError(errorData.message || 'Failed to fetch appointments');
+          try {
+            const errorData = await response.json();
+            setError(errorData.message || 'Failed to fetch appointments');
+          } catch (parseError) {
+            setError('Failed to fetch appointments. Server returned an invalid response.');
+          }
         }
       } catch (error) {
         console.error('Error fetching appointments:', error);
         setError('Error fetching appointments. Please try again later.');
+        
+        // If we haven't exceeded retries and this is a network error, try again
+        if (retryCount < MAX_RETRIES && (error.name === 'TypeError' || error.message.includes('network'))) {
+          setRetryCount(prevCount => prevCount + 1);
+          const delay = Math.pow(2, retryCount) * 1000;
+          console.log(`Will retry in ${delay}ms (attempt ${retryCount + 1}/${MAX_RETRIES})`);
+          setTimeout(() => {
+            if (currentUser) fetchAppointments();
+          }, delay);
+        }
       } finally {
         setLoading(false);
       }
@@ -41,7 +80,7 @@ const AppointmentsList = () => {
     } else {
       setLoading(false);
     }
-  }, [currentUser, authFetch]);
+  }, [currentUser, authFetch, retryCount]);
 
   // Format date
   const formatDate = (dateString) => {
@@ -55,32 +94,57 @@ const AppointmentsList = () => {
     setMessage({ text: '', type: '' });
     
     try {
-      const response = await authFetch(`/api/appointments/cancel/${appointmentId}`, {
-        method: 'PUT'
+      const response = await fetchWithRetry(`/api/appointments/${appointmentId}`, {
+        method: 'DELETE'
       });
       
       if (response.ok) {
-        const data = await response.json();
-        
-        // Update the appointment in the state
-        setAppointments(prevAppointments => 
-          prevAppointments.map(appointment => 
-            appointment._id === appointmentId 
-              ? { ...appointment, status: 'cancelled' } 
-              : appointment
-          )
-        );
-        
-        setMessage({
-          text: data.message || 'Appointment cancelled successfully',
-          type: 'success'
-        });
+        try {
+          const data = await response.json();
+          
+          // Update the appointment in the state
+          setAppointments(prevAppointments => 
+            prevAppointments.map(appointment => 
+              appointment._id === appointmentId 
+                ? { ...appointment, status: 'cancelled' } 
+                : appointment
+            )
+          );
+          
+          setMessage({
+            text: data.message || 'Appointment cancelled successfully',
+            type: 'success'
+          });
+        } catch (parseError) {
+          console.error('Error parsing cancellation response:', parseError);
+          
+          // Still update the UI state even if parsing failed
+          setAppointments(prevAppointments => 
+            prevAppointments.map(appointment => 
+              appointment._id === appointmentId 
+                ? { ...appointment, status: 'cancelled' } 
+                : appointment
+            )
+          );
+          
+          setMessage({
+            text: 'Appointment cancelled',
+            type: 'success'
+          });
+        }
       } else {
-        const errorData = await response.json();
-        setMessage({
-          text: errorData.message || 'Failed to cancel appointment',
-          type: 'error'
-        });
+        try {
+          const errorData = await response.json();
+          setMessage({
+            text: errorData.message || 'Failed to cancel appointment',
+            type: 'error'
+          });
+        } catch (parseError) {
+          setMessage({
+            text: 'Failed to cancel appointment. Server returned an invalid response.',
+            type: 'error'
+          });
+        }
       }
     } catch (error) {
       console.error('Error cancelling appointment:', error);

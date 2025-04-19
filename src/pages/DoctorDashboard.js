@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import PrescriptionTemplate from '../components/PrescriptionTemplate';
 
 const DoctorDashboard = () => {
   const { currentUser, authFetch, logout } = useAuth();
@@ -12,6 +13,7 @@ const DoctorDashboard = () => {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [notes, setNotes] = useState('');
   const [saveNoteStatus, setSaveNoteStatus] = useState({ loading: false, message: '', type: '' });
+  const [showPrescription, setShowPrescription] = useState(false);
 
   // Redirect if user is not logged in or not a doctor
   useEffect(() => {
@@ -449,6 +451,13 @@ const DoctorDashboard = () => {
                       </button>
                       
                       <button 
+                        className="action-button prescription-button"
+                        onClick={() => setShowPrescription(true)}
+                      >
+                        Write Prescription
+                      </button>
+                      
+                      <button 
                         className="action-button complete-button"
                         onClick={() => completeAppointment(selectedAppointment._id)}
                         disabled={saveNoteStatus.loading}
@@ -457,12 +466,28 @@ const DoctorDashboard = () => {
                       </button>
                     </>
                   )}
+                  {selectedAppointment.status === 'completed' && (
+                    <button 
+                      className="action-button prescription-button"
+                      onClick={() => setShowPrescription(true)}
+                    >
+                      Write Prescription
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
           </div>
         )}
       </div>
+      
+      {showPrescription && selectedAppointment && (
+        <PrescriptionTemplate 
+          patient={selectedAppointment.patientId} 
+          onClose={() => setShowPrescription(false)}
+          appointmentDetails={selectedAppointment}
+        />
+      )}
     </div>
   );
 };
