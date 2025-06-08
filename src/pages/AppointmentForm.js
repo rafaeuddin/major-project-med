@@ -78,6 +78,13 @@ const AppointmentForm = () => {
         ...prevState,
         symptoms: updatedSymptoms
       }));
+    } else if (name === 'doctor') {
+      setFormData(prevState => ({
+        ...prevState,
+        doctor: value,
+        selectedDate: new Date(),
+        selectedTimeSlot: null
+      }));
     } else {
       setFormData(prevState => ({
         ...prevState,
@@ -340,12 +347,15 @@ const AppointmentForm = () => {
               {errors.doctor && <span className="error-message">{errors.doctor}</span>}
             </div>
             
-            <CalendarComponent 
-              onDateSelect={handleDateSelect}
-              onTimeSlotSelect={handleTimeSlotSelect}
-              selectedDate={formData.selectedDate}
-              selectedTimeSlot={formData.selectedTimeSlot}
-            />
+            {formData.doctor && (
+              <CalendarComponent 
+                onDateSelect={handleDateSelect}
+                onTimeSlotSelect={handleTimeSlotSelect}
+                selectedDate={formData.selectedDate}
+                selectedTimeSlot={formData.selectedTimeSlot}
+                doctorId={formData.doctor}
+              />
+            )}
             
             {errors.selectedTimeSlot && <span className="error-message">{errors.selectedTimeSlot}</span>}
             

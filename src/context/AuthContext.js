@@ -34,6 +34,91 @@ export const AuthProvider = ({ children }) => {
       role: 'patient',
       isEmailVerified: true,
       isPhoneVerified: true
+    },
+    drsarah: {
+      username: 'drsarah',
+      email: 'drsarah@demo.com',
+      password: 'Test@1234',
+      role: 'doctor',
+      name: 'Dr. Sarah Johnson',
+      specialization: 'General Physician',
+      _id: 'doctor1'
+    },
+    drmichael: {
+      username: 'drmichael',
+      email: 'drmichael@demo.com',
+      password: 'Test@1234',
+      role: 'doctor',
+      name: 'Dr. Michael Chen',
+      specialization: 'Cardiologist',
+      _id: 'doctor2'
+    },
+    dremily: {
+      username: 'dremily',
+      email: 'dremily@demo.com',
+      password: 'Test@1234',
+      role: 'doctor',
+      name: 'Dr. Emily Rodriguez',
+      specialization: 'Pediatrician',
+      _id: 'doctor3'
+    },
+    drdavid: {
+      username: 'drdavid',
+      email: 'drdavid@demo.com',
+      password: 'Test@1234',
+      role: 'doctor',
+      name: 'Dr. David Kim',
+      specialization: 'Dermatologist',
+      _id: 'doctor4'
+    },
+    drpatricia: {
+      username: 'drpatricia',
+      email: 'drpatricia@demo.com',
+      password: 'Test@1234',
+      role: 'doctor',
+      name: 'Dr. Patricia Moore',
+      specialization: 'Neurologist',
+      _id: 'doctor5'
+    },
+    patientalice: {
+      username: 'patientalice',
+      email: 'alice@demo.com',
+      password: 'Test@1234',
+      role: 'patient',
+      name: 'Alice',
+      _id: 'patient1'
+    },
+    patientbob: {
+      username: 'patientbob',
+      email: 'bob@demo.com',
+      password: 'Test@1234',
+      role: 'patient',
+      name: 'Bob',
+      _id: 'patient2'
+    },
+    patientcarol: {
+      username: 'patientcarol',
+      email: 'carol@demo.com',
+      password: 'Test@1234',
+      role: 'patient',
+      name: 'Carol',
+      _id: 'patient3'
+    },
+    patientdan: {
+      username: 'patientdan',
+      email: 'dan@demo.com',
+      password: 'Test@1234',
+      role: 'patient',
+      name: 'Dan',
+      _id: 'patient4'
+    },
+    patientemma: {
+      username: 'patientemma',
+      email: 'emma@demo.com',
+      password: 'Test@1234',
+      role: 'patient',
+      name: 'Emma',
+      _id: 'patient5'
     }
   };
 
