@@ -105,7 +105,7 @@ const AppointmentsList = () => {
           // Update the appointment in the state
           setAppointments(prevAppointments => 
             prevAppointments.map(appointment => 
-              appointment._id === appointmentId 
+              appointment._id === appointmentId || appointment.id === appointmentId
                 ? { ...appointment, status: 'cancelled' } 
                 : appointment
             )
@@ -115,21 +115,18 @@ const AppointmentsList = () => {
             text: data.message || 'Appointment cancelled successfully',
             type: 'success'
           });
+
+          // Refresh appointments after cancellation
+          const refreshResponse = await fetchWithRetry('/api/appointments/user');
+          if (refreshResponse.ok) {
+            const refreshData = await refreshResponse.json();
+            setAppointments(refreshData.appointments || []);
+          }
         } catch (parseError) {
           console.error('Error parsing cancellation response:', parseError);
-          
-          // Still update the UI state even if parsing failed
-          setAppointments(prevAppointments => 
-            prevAppointments.map(appointment => 
-              appointment._id === appointmentId 
-                ? { ...appointment, status: 'cancelled' } 
-                : appointment
-            )
-          );
-          
           setMessage({
-            text: 'Appointment cancelled',
-            type: 'success'
+            text: 'Error processing cancellation response',
+            type: 'error'
           });
         }
       } else {
@@ -164,7 +161,8 @@ const AppointmentsList = () => {
       new Date(app.date) >= new Date()
     ),
     past: appointments.filter(app => 
-      ['completed', 'cancelled'].includes(app.status) || 
+      app.status === 'cancelled' || 
+      app.status === 'completed' || 
       new Date(app.date) < new Date()
     )
   };

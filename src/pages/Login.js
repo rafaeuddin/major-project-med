@@ -85,11 +85,11 @@ const Login = () => {
   ];
 
   const fillTestAccount = (account, role) => {
-    setFormData({
+      setFormData({
       identifier: account.username,
       password: account.password,
       role
-    });
+      });
   };
   
   return (
@@ -230,7 +230,7 @@ const Login = () => {
                   ))}
                 </tbody>
               </table>
-            </div>
+          </div>
           </div>
         </div>
       </div>

@@ -417,15 +417,20 @@ export const handlers = [
   // Fast-responding handlers for problematic endpoints (put these first for priority)
   // Fast user appointments handler
   http.get('/api/appointments/user', () => {
-    return new Response(
-      JSON.stringify({
-        success: true,
-        appointments: mockAppointments
-      }),
-      {
-        headers: { 'Content-Type': 'application/json' }
-      }
-    );
+    return HttpResponse.json({
+      success: true,
+      appointments: mockAppointments.map(app => ({
+        _id: app._id,
+        id: app._id, // Add id field to match both formats
+        patientId: app.patientId,
+        doctorId: app.doctorId,
+        date: app.date,
+        timeSlot: app.timeSlot,
+        status: app.status,
+        reason: app.reason,
+        notes: app.notes
+      }))
+    });
   }),
 
   // Fast patient profile handler
@@ -549,20 +554,28 @@ export const handlers = [
   http.delete('/api/appointments/:id', ({ params }) => {
     const { id } = params;
     
-    try {
-      // Make sure we return a valid response with all the needed data
+    // Find the appointment in mock data
+    const appointmentIndex = mockAppointments.findIndex(app => app._id === id);
+    
+    if (appointmentIndex !== -1) {
+      // Update the appointment status
+      mockAppointments[appointmentIndex].status = 'cancelled';
+      
       return HttpResponse.json({
         success: true,
-        message: `Appointment ${id} cancelled successfully`,
-        appointment: { _id: id, status: 'cancelled' }
+        message: 'Appointment cancelled successfully',
+        appointment: {
+          _id: mockAppointments[appointmentIndex]._id,
+          id: mockAppointments[appointmentIndex]._id,
+          ...mockAppointments[appointmentIndex]
+        }
       });
-    } catch (error) {
-      console.error('Error in appointment cancellation handler:', error);
-      return HttpResponse.json({
-        success: false,
-        message: 'Failed to cancel appointment'
-      }, { status: 500 });
     }
+    
+    return HttpResponse.json({
+      success: false,
+      message: 'Appointment not found'
+    }, { status: 404 });
   }),
 
   // Doctors handlers
