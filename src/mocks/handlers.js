@@ -417,6 +417,7 @@ export const handlers = [
   // Fast-responding handlers for problematic endpoints (put these first for priority)
   // Fast user appointments handler
   http.get('/api/appointments/user', () => {
+<<<<<<< HEAD
     return new Response(
       JSON.stringify({
         success: true,
@@ -426,6 +427,22 @@ export const handlers = [
         headers: { 'Content-Type': 'application/json' }
       }
     );
+=======
+    return HttpResponse.json({
+      success: true,
+      appointments: mockAppointments.map(app => ({
+        _id: app._id,
+        id: app._id, // Add id field to match both formats
+        patientId: app.patientId,
+        doctorId: app.doctorId,
+        date: app.date,
+        timeSlot: app.timeSlot,
+        status: app.status,
+        reason: app.reason,
+        notes: app.notes
+      }))
+    });
+>>>>>>> 0f73f305686331e3366027683e38750020b6bba4
   }),
 
   // Fast patient profile handler
@@ -549,6 +566,7 @@ export const handlers = [
   http.delete('/api/appointments/:id', ({ params }) => {
     const { id } = params;
     
+<<<<<<< HEAD
     try {
       // Make sure we return a valid response with all the needed data
       return HttpResponse.json({
@@ -563,6 +581,30 @@ export const handlers = [
         message: 'Failed to cancel appointment'
       }, { status: 500 });
     }
+=======
+    // Find the appointment in mock data
+    const appointmentIndex = mockAppointments.findIndex(app => app._id === id);
+    
+    if (appointmentIndex !== -1) {
+      // Update the appointment status
+      mockAppointments[appointmentIndex].status = 'cancelled';
+      
+      return HttpResponse.json({
+        success: true,
+        message: 'Appointment cancelled successfully',
+        appointment: {
+          _id: mockAppointments[appointmentIndex]._id,
+          id: mockAppointments[appointmentIndex]._id,
+          ...mockAppointments[appointmentIndex]
+        }
+      });
+    }
+    
+    return HttpResponse.json({
+      success: false,
+      message: 'Appointment not found'
+    }, { status: 404 });
+>>>>>>> 0f73f305686331e3366027683e38750020b6bba4
   }),
 
   // Doctors handlers

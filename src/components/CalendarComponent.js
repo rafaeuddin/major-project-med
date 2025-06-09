@@ -229,6 +229,10 @@ const CalendarComponent = ({ onDateSelect, onTimeSlotSelect, selectedDate, selec
           {timeSlots.map((slot, index) => (
             <button
               key={index}
+<<<<<<< HEAD
+=======
+              type="button"
+>>>>>>> 0f73f305686331e3366027683e38750020b6bba4
               onClick={() => handleTimeSlotSelection(slot)}
               className={localSelectedTimeSlot === slot ? 'selected' : ''}
               style={{

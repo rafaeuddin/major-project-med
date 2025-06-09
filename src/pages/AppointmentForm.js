@@ -78,6 +78,16 @@ const AppointmentForm = () => {
         ...prevState,
         symptoms: updatedSymptoms
       }));
+<<<<<<< HEAD
+=======
+    } else if (name === 'doctor') {
+      setFormData(prevState => ({
+        ...prevState,
+        doctor: value,
+        selectedDate: new Date(),
+        selectedTimeSlot: null
+      }));
+>>>>>>> 0f73f305686331e3366027683e38750020b6bba4
     } else {
       setFormData(prevState => ({
         ...prevState,
@@ -340,12 +350,24 @@ const AppointmentForm = () => {
               {errors.doctor && <span className="error-message">{errors.doctor}</span>}
             </div>
             
+<<<<<<< HEAD
             <CalendarComponent 
               onDateSelect={handleDateSelect}
               onTimeSlotSelect={handleTimeSlotSelect}
               selectedDate={formData.selectedDate}
               selectedTimeSlot={formData.selectedTimeSlot}
             />
+=======
+            {formData.doctor && (
+              <CalendarComponent 
+                onDateSelect={handleDateSelect}
+                onTimeSlotSelect={handleTimeSlotSelect}
+                selectedDate={formData.selectedDate}
+                selectedTimeSlot={formData.selectedTimeSlot}
+                doctorId={formData.doctor}
+              />
+            )}
+>>>>>>> 0f73f305686331e3366027683e38750020b6bba4
             
             {errors.selectedTimeSlot && <span className="error-message">{errors.selectedTimeSlot}</span>}
             

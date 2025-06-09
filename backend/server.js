@@ -229,7 +229,11 @@ if (process.env.NODE_ENV === 'development') {
           doctorName: 'Dr. Sarah Johnson',
           date: '2025-04-25',
           timeSlot: '10:00 AM',
+<<<<<<< HEAD
           status: 'confirmed',
+=======
+          status: 'scheduled',
+>>>>>>> 0f73f305686331e3366027683e38750020b6bba4
           reason: 'Annual checkup',
           createdAt: '2025-04-10'
         },
@@ -239,7 +243,11 @@ if (process.env.NODE_ENV === 'development') {
           doctorName: 'Dr. Michael Chen',
           date: '2025-05-05',
           timeSlot: '2:30 PM',
+<<<<<<< HEAD
           status: 'pending',
+=======
+          status: 'scheduled',
+>>>>>>> 0f73f305686331e3366027683e38750020b6bba4
           reason: 'Follow-up appointment',
           createdAt: '2025-04-12'
         }
@@ -247,6 +255,33 @@ if (process.env.NODE_ENV === 'development') {
     });
   });
   
+<<<<<<< HEAD
+=======
+  // Mock appointment cancellation endpoint
+  app.delete('/api/appointments/:id', (req, res) => {
+    const { id } = req.params;
+    
+    // Find the appointment in the mock data
+    const appointmentIndex = testAppointments.findIndex(apt => apt._id === id);
+    
+    if (appointmentIndex !== -1) {
+      // Update the appointment status to cancelled
+      testAppointments[appointmentIndex].status = 'cancelled';
+      
+      res.json({
+        success: true,
+        message: 'Appointment cancelled successfully',
+        appointment: testAppointments[appointmentIndex]
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'Appointment not found'
+      });
+    }
+  });
+  
+>>>>>>> 0f73f305686331e3366027683e38750020b6bba4
   // Mock nutrition data
   app.get('/api/food/nutrition/summary', (req, res) => {
     res.json({

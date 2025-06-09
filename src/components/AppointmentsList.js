@@ -105,7 +105,11 @@ const AppointmentsList = () => {
           // Update the appointment in the state
           setAppointments(prevAppointments => 
             prevAppointments.map(appointment => 
+<<<<<<< HEAD
               appointment._id === appointmentId 
+=======
+              appointment._id === appointmentId || appointment.id === appointmentId
+>>>>>>> 0f73f305686331e3366027683e38750020b6bba4
                 ? { ...appointment, status: 'cancelled' } 
                 : appointment
             )
@@ -115,6 +119,7 @@ const AppointmentsList = () => {
             text: data.message || 'Appointment cancelled successfully',
             type: 'success'
           });
+<<<<<<< HEAD
         } catch (parseError) {
           console.error('Error parsing cancellation response:', parseError);
           
@@ -130,6 +135,20 @@ const AppointmentsList = () => {
           setMessage({
             text: 'Appointment cancelled',
             type: 'success'
+=======
+
+          // Refresh appointments after cancellation
+          const refreshResponse = await fetchWithRetry('/api/appointments/user');
+          if (refreshResponse.ok) {
+            const refreshData = await refreshResponse.json();
+            setAppointments(refreshData.appointments || []);
+          }
+        } catch (parseError) {
+          console.error('Error parsing cancellation response:', parseError);
+          setMessage({
+            text: 'Error processing cancellation response',
+            type: 'error'
+>>>>>>> 0f73f305686331e3366027683e38750020b6bba4
           });
         }
       } else {
@@ -164,7 +183,12 @@ const AppointmentsList = () => {
       new Date(app.date) >= new Date()
     ),
     past: appointments.filter(app => 
+<<<<<<< HEAD
       ['completed', 'cancelled'].includes(app.status) || 
+=======
+      app.status === 'cancelled' || 
+      app.status === 'completed' || 
+>>>>>>> 0f73f305686331e3366027683e38750020b6bba4
       new Date(app.date) < new Date()
     )
   };
